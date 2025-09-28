@@ -4,26 +4,33 @@ services:
   iza-os-ai-vision-platform:
     build: .
     ports:
-      - "3000:3000"
+      - "5000:5000"
     environment:
       - NODE_ENV=production
       - REPO_NAME=iza-os-ai-vision-platform
       - ORGANIZATION=Worldwidebro
-    volumes:
-      - ./logs:/app/logs
-      - ./data:/app/data
+      - OLLAMA_HOST=ollama:11434
+    depends_on:
+      - ollama
+      - redis
     networks:
       - billionaire-empire
     restart: unless-stopped
 
-  monitoring:
-    image: prom/prometheus
-    ports:
-      - "9090:9090"
+  ollama:
+    image: ollama/ollama
     volumes:
-      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ollama_data:/root/.ollama
     networks:
       - billionaire-empire
+
+  redis:
+    image: redis:7-alpine
+    networks:
+      - billionaire-empire
+
+volumes:
+  ollama_data:
 
 networks:
   billionaire-empire:
